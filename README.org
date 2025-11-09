@@ -1,0 +1,181 @@
+#+TITLE: my-claude-bot
+#+AUTHOR: Your Name
+#+EMAIL: your.email@example.com
+#+OPTIONS: toc:2 num:nil
+
+* Overview
+
+GitHub App integration for Emacs, providing authenticated access to GitHub's API using GitHub App authentication.
+
+** What is this?
+
+This Emacs package allows you to interact with GitHub using a GitHub App, which provides more secure and flexible authentication than personal access tokens. It's designed to integrate GitHub functionality directly into your Emacs workflow.
+
+* Features
+
+- GitHub App authentication
+- API request framework
+- Secure credential management
+- Extensible architecture for custom GitHub integrations
+
+* Prerequisites
+
+- Emacs 27.1 or later
+- A GitHub App (see setup instructions below)
+- Access to your GitHub App's private key
+
+* Creating Your GitHub App
+
+1. *Go to GitHub App settings:*
+   - Personal account: https://github.com/settings/apps
+   - Organization: https://github.com/organizations/YOUR_ORG/settings/apps
+
+2. *Click "New GitHub App"*
+
+3. *Fill in the details:*
+   - *Name*: =my-claude-bot= (or your preferred name)
+   - *Homepage URL*: =https://github.com/ckozzy/my-claude-bot=
+   - *Webhook*: Uncheck "Active" (not needed for this integration)
+   - *Permissions*: Choose based on your needs
+     - Repository Contents: Read (or Read/Write)
+     - Repository Metadata: Read
+     - Issues: Read/Write (if you want to manage issues)
+     - Pull Requests: Read/Write (if you want to manage PRs)
+   - *Where can this app be installed?*: "Only on this account" (for personal use)
+
+4. *Create the app* and note your *App ID*
+
+5. *Generate a private key:*
+   - Scroll down to "Private keys"
+   - Click "Generate a private key"
+   - Save the downloaded =.pem= file securely (e.g., =~/.config/github-apps/my-claude-bot.pem=)
+   - *Never commit this file to version control!*
+
+6. *Install the app:*
+   - Click "Install App" in the left sidebar
+   - Choose your account
+   - Select "All repositories" or specific repositories
+   - Note the *Installation ID* from the URL (e.g., =https://github.com/settings/installations/12345678=)
+
+* Installation
+
+** Using straight.el
+
+#+begin_src elisp
+(straight-use-package
+ '(my-claude-bot :type git :host github :repo "ckozzy/my-claude-bot"))
+#+end_src
+
+** Manual Installation
+
+1. Clone this repository:
+   #+begin_src bash
+   git clone https://github.com/ckozzy/my-claude-bot.git ~/path/to/my-claude-bot
+   #+end_src
+
+2. Add to your Emacs configuration:
+   #+begin_src elisp
+   (add-to-list 'load-path "~/path/to/my-claude-bot")
+   (require 'my-claude-bot)
+   #+end_src
+
+* Configuration
+
+Add the following to your Emacs init file (e.g., =~/.emacs.d/init.el= or =~/.doom.d/config.el=):
+
+#+begin_src elisp
+(use-package my-claude-bot
+  :custom
+  (my-claude-bot-app-id "YOUR_APP_ID")
+  (my-claude-bot-private-key-file "~/.config/github-apps/my-claude-bot.pem")
+  (my-claude-bot-installation-id "YOUR_INSTALLATION_ID"))
+#+end_src
+
+Or without =use-package=:
+
+#+begin_src elisp
+(setq my-claude-bot-app-id "YOUR_APP_ID")
+(setq my-claude-bot-private-key-file "~/.config/github-apps/my-claude-bot.pem")
+(setq my-claude-bot-installation-id "YOUR_INSTALLATION_ID")
+#+end_src
+
+See =config.example.el= for a complete example.
+
+* Usage
+
+** Test Your Connection
+
+#+begin_example
+M-x my-claude-bot-test-connection
+#+end_example
+
+** Get Repository Info
+
+#+begin_example
+M-x my-claude-bot-get-repo-info
+#+end_example
+
+* Current Limitations
+
+*Important*: The current implementation has a limitation with JWT signing. GitHub Apps require RS256 JWT tokens for authentication, which requires cryptographic signing that's not trivial in pure Emacs Lisp.
+
+** Solutions
+
+You have several options to complete the JWT implementation:
+
+1. *Use existing packages* (Recommended):
+   - Use [[https://github.com/magit/ghub][ghub]] which already handles GitHub App authentication
+   - Use [[https://github.com/magit/forge][forge]] for a complete GitHub/GitLab integration
+
+2. *External tool approach*:
+   - Install [[https://github.com/Link-/github-app-token][github-app-token]] CLI tool
+   - Modify =my-claude-bot--generate-jwt-external= to call this tool
+
+3. *Implement JWT signing*:
+   - Use the =openssl= command-line tool via =shell-command=
+   - Contribute a pure Elisp RS256 implementation
+
+* Development
+
+** Project Structure
+
+#+begin_example
+my-claude-bot/
+├── my-claude-bot.el      # Main package file
+├── config.example.el     # Example configuration
+├── README.org            # This file
+└── .gitignore            # Git ignore rules (includes .pem files)
+#+end_example
+
+** Contributing
+
+Contributions are welcome! Areas for improvement:
+
+- [ ] Implement JWT signing (RS256)
+- [ ] Add more GitHub API helper functions
+- [ ] Add interactive commands for common tasks
+- [ ] Add tests
+- [ ] Add CI/CD
+- [ ] Package for MELPA
+
+* Security Notes
+
+- *Never commit your private key (=.pem= file)*
+- *Never commit your App ID or Installation ID if you want to keep them private*
+- Store credentials securely outside of version control
+- Consider using =auth-source= for credential storage
+
+* Resources
+
+- [[https://docs.github.com/en/apps][GitHub Apps Documentation]]
+- [[https://docs.github.com/en/rest][GitHub API Documentation]]
+- [[https://docs.github.com/en/apps/creating-github-apps][Creating a GitHub App]]
+- [[https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app][Authenticating as a GitHub App]]
+
+* License
+
+MIT License - See LICENSE file for details
+
+* Author
+
+Your Name - https://github.com/ckozzy

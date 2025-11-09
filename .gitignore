@@ -1,0 +1,18 @@
+# Emacs
+*~
+\#*\#
+.\#*
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# GitHub App credentials (NEVER commit these!)
+*.pem
+.env
+github-app-credentials.el
+auth-source
+
+# OS
+.DS_Store
+Thumbs.db

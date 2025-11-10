@@ -1,7 +1,8 @@
 #+TITLE: my-claude-bot
-#+AUTHOR: Your Name
-#+EMAIL: your.email@example.com
+#+AUTHOR: Kelly Osborn
+#+EMAIL: kelly@shadetree.biz
 #+OPTIONS: toc:2 num:nil
+#+STARTUP: overview
 
 * Overview
 
@@ -13,14 +14,23 @@ This Emacs package allows you to interact with GitHub using a GitHub App, which 
 
 * Features
 
-- GitHub App authentication
+- GitHub App authentication with JWT token generation
 - API request framework
 - Secure credential management
-- Extensible architecture for custom GitHub integrations
+- Comprehensive GitHub operations:
+  - *Issue Management*: Create, list, comment, and close issues
+  - *Pull Request Operations*: Create, review, merge, and list PRs
+  - *Repository Browsing*: List repos, search code, view files
+  - *Commit Operations*: View commit history and details
+  - *Workflow Automation*: Trigger workflows, check CI status
+
+See =COMMANDS.org= for complete command reference.
 
 * Prerequisites
 
 - Emacs 27.1 or later
+- Python 3 with packages: =PyJWT=, =cryptography=, =requests=
+  - Install with: ~pip3 install PyJWT cryptography requests~
 - A GitHub App (see setup instructions below)
 - Access to your GitHub App's private key
 
@@ -103,37 +113,38 @@ See =config.example.el= for a complete example.
 
 * Usage
 
-** Test Your Connection
+** Quick Start
 
+Test your connection:
 #+begin_example
 M-x my-claude-bot-test-connection
 #+end_example
 
-** Get Repository Info
-
+List your accessible repositories:
 #+begin_example
-M-x my-claude-bot-get-repo-info
+M-x my-claude-bot-list-repos
 #+end_example
 
-* Current Limitations
+** Available Commands
 
-*Important*: The current implementation has a limitation with JWT signing. GitHub Apps require RS256 JWT tokens for authentication, which requires cryptographic signing that's not trivial in pure Emacs Lisp.
+The package provides 25+ interactive commands organized into categories:
 
-** Solutions
+- *Issue Management*: =my-claude-bot-list-issues=, =my-claude-bot-create-issue=, etc.
+- *Pull Requests*: =my-claude-bot-list-prs=, =my-claude-bot-create-pr=, =my-claude-bot-merge-pr=, etc.
+- *Repository Browsing*: =my-claude-bot-list-repos=, =my-claude-bot-search-code=, =my-claude-bot-get-file-contents=
+- *Commits*: =my-claude-bot-list-commits=, =my-claude-bot-get-commit=
+- *Workflows*: =my-claude-bot-list-workflows=, =my-claude-bot-trigger-workflow=, =my-claude-bot-check-commit-status=
 
-You have several options to complete the JWT implementation:
+For complete documentation of all commands, see =COMMANDS.org=.
 
-1. *Use existing packages* (Recommended):
-   - Use [[https://github.com/magit/ghub][ghub]] which already handles GitHub App authentication
-   - Use [[https://github.com/magit/forge][forge]] for a complete GitHub/GitLab integration
+* How It Works
 
-2. *External tool approach*:
-   - Install [[https://github.com/Link-/github-app-token][github-app-token]] CLI tool
-   - Modify =my-claude-bot--generate-jwt-external= to call this tool
+The package uses a Python script (=github-app-token.py=) to generate JWT tokens and installation access tokens. This approach:
 
-3. *Implement JWT signing*:
-   - Use the =openssl= command-line tool via =shell-command=
-   - Contribute a pure Elisp RS256 implementation
+- Handles RS256 JWT signing using industry-standard libraries
+- Automatically refreshes tokens when they expire
+- Caches tokens to minimize API calls
+- Works reliably across different platforms
 
 * Development
 
@@ -142,7 +153,9 @@ You have several options to complete the JWT implementation:
 #+begin_example
 my-claude-bot/
 ├── my-claude-bot.el      # Main package file
+├── github-app-token.py   # JWT/token generation script
 ├── config.example.el     # Example configuration
+├── COMMANDS.org          # Command reference
 ├── README.org            # This file
 └── .gitignore            # Git ignore rules (includes .pem files)
 #+end_example
@@ -151,12 +164,15 @@ my-claude-bot/
 
 Contributions are welcome! Areas for improvement:
 
-- [ ] Implement JWT signing (RS256)
-- [ ] Add more GitHub API helper functions
-- [ ] Add interactive commands for common tasks
+- [X] Implement JWT signing (RS256) - ✓ Done with Python script
+- [X] Add more GitHub API helper functions - ✓ 25+ commands implemented
+- [X] Add interactive commands for common tasks - ✓ Complete
 - [ ] Add tests
 - [ ] Add CI/CD
 - [ ] Package for MELPA
+- [ ] Add org-mode integration (link to issues/PRs from org files)
+- [ ] Add magit integration
+- [ ] Add inline diff viewing
 
 * Security Notes
 

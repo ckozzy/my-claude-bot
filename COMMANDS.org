@@ -1,0 +1,321 @@
+#+TITLE: ko-claude-bot Command Reference
+#+AUTHOR: GitHub App Commands
+#+OPTIONS: toc:2 num:nil
+#+STARTUP: overview
+
+* Quick Start
+
+All commands are accessed via ~M-x~ followed by the command name.
+
+To see all available commands, type: ~M-x my-claude-bot-~ and press TAB for autocomplete.
+
+* 1. Issue Management
+
+** List Issues
+~M-x my-claude-bot-list-issues~
+
+Prompts:
+- Repository owner (e.g., ~torvalds~)
+- Repository name (e.g., ~linux~)
+- State: ~open~, ~closed~, or ~all~ (default: open)
+
+Opens a buffer showing all issues with their numbers, titles, and URLs.
+
+** Create Issue
+~M-x my-claude-bot-create-issue~
+
+Prompts:
+- Repository owner
+- Repository name
+- Issue title
+- Issue body/description
+
+Creates a new issue and displays the issue number and URL.
+
+** Comment on Issue
+~M-x my-claude-bot-comment-on-issue~
+
+Prompts:
+- Repository owner
+- Repository name
+- Issue number
+- Comment text
+
+Adds a comment to an existing issue.
+
+** Close Issue
+~M-x my-claude-bot-close-issue~
+
+Prompts:
+- Repository owner
+- Repository name
+- Issue number
+
+Closes the specified issue.
+
+* 2. Pull Request Operations
+
+** List Pull Requests
+~M-x my-claude-bot-list-prs~
+
+Prompts:
+- Repository owner
+- Repository name
+- State: ~open~, ~closed~, or ~all~ (default: open)
+
+Opens a buffer showing all PRs with their numbers, titles, branches, and URLs.
+
+** Create Pull Request
+~M-x my-claude-bot-create-pr~
+
+Prompts:
+- Repository owner
+- Repository name
+- PR title
+- Head branch (branch with your changes)
+- Base branch (branch to merge into, usually ~main~ or ~master~)
+- PR body/description
+
+Creates a new pull request.
+
+** Merge Pull Request
+~M-x my-claude-bot-merge-pr~
+
+Prompts:
+- Repository owner
+- Repository name
+- PR number
+- Confirmation (yes/no)
+
+Merges the specified pull request.
+
+** Review Pull Request
+~M-x my-claude-bot-review-pr~
+
+Prompts:
+- Repository owner
+- Repository name
+- PR number
+- Event: ~APPROVE~, ~REQUEST_CHANGES~, or ~COMMENT~
+- Review comment
+
+Submits a review for a pull request.
+
+* 3. Repository Browsing
+
+** List Accessible Repositories
+~M-x my-claude-bot-list-repos~
+
+No prompts needed.
+
+Shows all repositories your GitHub App has access to, with stats like stars, forks, and language.
+
+** Search Code
+~M-x my-claude-bot-search-code~
+
+Prompts:
+- Search query (GitHub code search syntax)
+
+Examples:
+- ~extension:el my-claude-bot~ - Search for elisp files containing "my-claude-bot"
+- ~org:github create-issue~ - Search for "create-issue" in GitHub org
+- ~language:python requests~ - Search for "requests" in Python files
+
+Opens a buffer with search results.
+
+** Get File Contents
+~M-x my-claude-bot-get-file-contents~
+
+Prompts:
+- Repository owner
+- Repository name
+- File path (e.g., ~README.md~ or ~src/main.py~)
+- Branch/tag/commit (optional, defaults to default branch)
+
+Opens the file contents in a new buffer.
+
+* 4. Commit Operations
+
+** List Commits
+~M-x my-claude-bot-list-commits~
+
+Prompts:
+- Repository owner
+- Repository name
+- Branch/SHA (optional)
+- File path filter (optional - shows only commits affecting this file)
+
+Opens a buffer showing commit history.
+
+** Get Commit Details
+~M-x my-claude-bot-get-commit~
+
+Prompts:
+- Repository owner
+- Repository name
+- Commit SHA
+
+Shows detailed information about a specific commit including:
+- Message
+- Author
+- Statistics (additions/deletions)
+- Files changed
+
+* 5. Workflow Automation (GitHub Actions)
+
+** List Workflows
+~M-x my-claude-bot-list-workflows~
+
+Prompts:
+- Repository owner
+- Repository name
+
+Shows all GitHub Actions workflows in the repository.
+
+** Trigger Workflow
+~M-x my-claude-bot-trigger-workflow~
+
+Prompts:
+- Repository owner
+- Repository name
+- Workflow ID or filename (e.g., ~ci.yml~ or workflow ID number)
+- Branch/tag to run on
+
+Triggers a workflow dispatch event.
+
+*Note:* The workflow must have ~workflow_dispatch~ trigger configured.
+
+** List Workflow Runs
+~M-x my-claude-bot-list-workflow-runs~
+
+Prompts:
+- Repository owner
+- Repository name
+- Workflow ID (optional - leave empty to see all runs)
+
+Shows recent workflow runs with their status and conclusions.
+
+** Check Commit Status
+~M-x my-claude-bot-check-commit-status~
+
+Prompts:
+- Repository owner
+- Repository name
+- Commit SHA/branch/tag
+
+Shows the status of CI checks for a specific commit.
+
+* 6. Utility Commands
+
+** Test Connection
+~M-x my-claude-bot-test-connection~
+
+No prompts needed.
+
+Tests your GitHub App authentication and displays configuration info.
+
+** Get Repository Info
+~M-x my-claude-bot-get-repo-info~
+
+Prompts:
+- Repository owner
+- Repository name
+
+Shows basic repository information (description, stars, etc.)
+
+* Tips and Tricks
+
+** Using with Elisp
+
+You can also call these functions from your own Elisp code:
+
+#+begin_src elisp
+;; Get issues programmatically
+(my-claude-bot-list-issues "owner" "repo" "open")
+
+;; Create an issue
+(my-claude-bot-create-issue "owner" "repo"
+                            "Bug: Something is broken"
+                            "Here are the details...")
+
+;; List your repos
+(my-claude-bot-list-repos)
+#+end_src
+
+** Direct API Access
+
+For endpoints not covered by the interactive commands, use the ~my-claude-bot-request~ function:
+
+#+begin_src elisp
+;; GET request
+(my-claude-bot-request "GET" "/repos/owner/repo/branches")
+
+;; POST request with data
+(my-claude-bot-request "POST" "/repos/owner/repo/issues"
+                       '((title . "New Issue")
+                         (body . "Description")))
+#+end_src
+
+See the [[https://docs.github.com/en/rest][GitHub REST API documentation]] for available endpoints.
+
+** Keyboard Shortcuts
+
+You can bind frequently-used commands to keys in your Emacs config:
+
+#+begin_src elisp
+(global-set-key (kbd "C-c g i") 'my-claude-bot-list-issues)
+(global-set-key (kbd "C-c g p") 'my-claude-bot-list-prs)
+(global-set-key (kbd "C-c g r") 'my-claude-bot-list-repos)
+#+end_src
+
+* Common Workflows
+
+** Creating and Managing an Issue
+
+1. ~M-x my-claude-bot-create-issue~
+2. ~M-x my-claude-bot-comment-on-issue~ (to add updates)
+3. ~M-x my-claude-bot-close-issue~ (when resolved)
+
+** Pull Request Workflow
+
+1. ~M-x my-claude-bot-create-pr~
+2. ~M-x my-claude-bot-review-pr~ (for review)
+3. ~M-x my-claude-bot-merge-pr~ (to merge)
+
+** Monitoring CI/CD
+
+1. ~M-x my-claude-bot-list-workflows~ (see available workflows)
+2. ~M-x my-claude-bot-list-workflow-runs~ (check recent runs)
+3. ~M-x my-claude-bot-check-commit-status~ (check specific commit)
+
+* Troubleshooting
+
+** "Failed to generate access token"
+
+Make sure Python dependencies are installed:
+#+begin_src bash
+pip3 install PyJWT cryptography requests
+#+end_src
+
+** "Private key file not found"
+
+Check your config:
+- File path: ~~/.config/github-apps/ko-claude-bot.pem~
+- Make sure the file exists and has correct permissions (~chmod 600~)
+
+** "API request failed"
+
+- Check your App ID and Installation ID are correct
+- Verify the GitHub App has the required permissions
+- Check the repository name and owner are correct
+
+** Need More Permissions?
+
+Go to your GitHub App settings and update permissions:
+https://github.com/settings/apps/ko-claude-bot
+
+* Resources
+
+- [[https://docs.github.com/en/rest][GitHub REST API Documentation]]
+- [[https://docs.github.com/en/apps][GitHub Apps Documentation]]
+- Package source: =~/ws/AI/my-claude-bot/my-claude-bot.el=
